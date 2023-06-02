@@ -2,6 +2,7 @@ package com.example.mobilecalendar.roomdb
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.LocalTime
 
@@ -13,7 +14,7 @@ import java.time.LocalTime
             childColumns = ["scheduleId"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ], indices = [Index(value = ["scheduleId"])]
 )
 
 data class Alarm(
