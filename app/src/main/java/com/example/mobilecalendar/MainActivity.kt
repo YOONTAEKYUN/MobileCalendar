@@ -3,11 +3,14 @@
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.CalendarView
-import androidx.appcompat.app.AppCompatActivity
-import com.example.mobilecalendar.databinding.ActivityMainBinding
-import com.example.mobilecalendar.databinding.TodoBinding
 
+import androidx.appcompat.app.AppCompatActivity
+import com.example.mobilecalendar.TodoMainActivity
+import com.example.mobilecalendar.databinding.ActivityMainBinding
+
+import com.example.mobilecalendar.view.CalendarViewContainer
+import com.example.mobilecalendar.view.EditTodoActivity
+import com.example.mobilecalendar.view.TodoViewModel
 
 
 class MainActivity : AppCompatActivity() {
@@ -18,11 +21,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.calendar.setOnClickListener{
-            val intent = Intent(this , CalendarView::class.java)
+            val intent = Intent(this , CalendarViewContainer::class.java)
             startActivity(intent)
         }
         binding.todo.setOnClickListener {
-            val intent = Intent(this, TodoBinding::class.java)
+            val intent = Intent(this, TodoMainActivity::class.java)
             startActivity(intent)
         }
     }
