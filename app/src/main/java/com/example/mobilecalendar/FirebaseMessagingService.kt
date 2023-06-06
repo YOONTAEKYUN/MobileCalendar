@@ -15,34 +15,6 @@ import java.util.Date
 
 
 class FirebaseMessagingService : FirebaseMessagingService() {
-//    private var msg: String? = null
-//    private var title: String? = null
-//    override fun onMessageReceived(remoteMessage: RemoteMessage) {
-//        title = remoteMessage.notification!!.title
-//        msg = remoteMessage.notification!!.body
-//        val intent = Intent(this, MainActivity::class.java)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//        val contentIntent = PendingIntent.getActivity(
-//            this, 0, Intent(
-//                this,
-//                MainActivity::class.java
-//            ), PendingIntent.FLAG_IMMUTABLE
-//        )
-//        val mBuilder: NotificationCompat.Builder =
-//            NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher)
-//                .setContentTitle(title)
-//                .setContentText(msg)
-//                .setAutoCancel(true)
-//                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-//                .setVibrate(longArrayOf(1, 1000))
-//        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-//        notificationManager.notify(0, mBuilder.build())
-//        mBuilder.setContentIntent(contentIntent)
-//    }
-//
-//    companion object {
-//        private const val TAG = "FirebaseMsgService"
-//    }
     override fun onNewToken(token: String) {
         Log.d("MyFcmService", "New token :: $token")
         sendTokenToServer(token)
