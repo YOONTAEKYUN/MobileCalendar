@@ -59,6 +59,14 @@ dependencies {
 
     implementation platform('com.google.firebase:firebase-bom:32.1.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
+
+    //for kakao 전체 모듈 설치 com.kakao.sdk가 인식이 안되는 문제 발생 =...
+    implementation "com.kakao.sdk:v2-share:2.11.2"
+    implementation "com.kakao.sdk:v2-user-rx:2.4.2" // 카카오 로그인
+    implementation "com.kakao.sdk:v2-talk-rx:2.4.2" // 친구, 메시지(카카오톡)
+    implementation "com.kakao.sdk:v2-story-rx:2.4.2" // 카카오스토리
+    implementation "com.kakao.sdk:v2-link-rx:2.4.2" // 메시지(카카오링크)
+    implementation "com.kakao.sdk:v2-navi:2.4.2" // 카카오내비
 }
 
 apply plugin: 'com.google.gms.google-services'
