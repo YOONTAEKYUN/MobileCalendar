@@ -29,9 +29,11 @@ import com.kakao.sdk.template.model.Content
 import com.kakao.sdk.template.model.FeedTemplate
 import com.kakao.sdk.template.model.Link
 import com.kakao.sdk.template.model.ListTemplate
+import com.kakao.sdk.common.util.Utility
 
-// import com.kakao.sdk.template
-//디버그 키 해시: yzXmrPCP5gi9Nt0gJOplguL51Sc=
+// 디버그 키 해시 : yzXmrPCP5gi9Nt0gJOplguL51Sc=
+// 릴리즈 키 해시 : nZfccoI3KzCvTHynSMOxiSTBwXE=
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -88,6 +90,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // 카카오 api 사용을 위한 릴리즈 해시키 확인
+        var keyHash = Utility.getKeyHash(this)
+        Log.d("hash", keyHash.toString())
         //카카오톡 메시지 공유 api, list 템플릿
         val defaultList = ListTemplate(
             headerTitle = "WEEKLY MAGAZINE",
@@ -142,108 +147,52 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        // 피드 메시지 보내기
+        // 카카오톡으로 데이터를 리스트 형식으로 공유하는 기능
+        // 임시로 공유 버튼 추가
+        binding.testButton.setOnClickListener {
+            // 카카오톡 설치여부 확인
+            if (ShareClient.instance.isKakaoTalkSharingAvailable(this)) {
+                // 카카오톡으로 카카오톡 공유 가능
+                ShareClient.instance.shareDefault(this, defaultList) { sharingResult, error ->
+                    if (error != null) {
+                        Log.e("kakao", "카카오톡 공유 실패", error)
+                    }
+                    else if (sharingResult != null) {
+                        Log.d("kakao", "카카오톡 공유 성공 ${sharingResult.intent}")
+                        startActivity(sharingResult.intent)
 
-        // 카카오톡 설치여부 확인
-        if (ShareClient.instance.isKakaoTalkSharingAvailable(this)) {
-            // 카카오톡으로 카카오톡 공유 가능
-            ShareClient.instance.shareDefault(this, defaultList) { sharingResult, error ->
-                if (error != null) {
-                    Log.e("TAG", "카카오톡 공유 실패", error)
+                        // 카카오톡 공유에 성공했지만 아래 경고 메시지가 존재할 경우 일부 컨텐츠가 정상 동작하지 않을 수 있습니다.
+                        Log.w("kakao", "Warning Msg: ${sharingResult.warningMsg}")
+                        Log.w("kakao", "Argument Msg: ${sharingResult.argumentMsg}")
+                    }
                 }
-                else if (sharingResult != null) {
-                    Log.d("TAG", "카카오톡 공유 성공 ${sharingResult.intent}")
-                    startActivity(sharingResult.intent)
+            } else {
+                // 카카오톡 미설치: 웹 공유 사용 권장
+                // 웹 공유 예시 코드
+                val sharerUrl = WebSharerClient.instance.makeDefaultUrl(defaultList)
 
-                    // 카카오톡 공유에 성공했지만 아래 경고 메시지가 존재할 경우 일부 컨텐츠가 정상 동작하지 않을 수 있습니다.
-                    Log.w("TAG", "Warning Msg: ${sharingResult.warningMsg}")
-                    Log.w("TAG", "Argument Msg: ${sharingResult.argumentMsg}")
+                // CustomTabs으로 웹 브라우저 열기
+
+                // 1. CustomTabsServiceConnection 지원 브라우저 열기
+                // ex) Chrome, 삼성 인터넷, FireFox, 웨일 등
+                try {
+                    //KakaoCustomTabsClient.openWithDefault(this, sharerUrl)
+                } catch(e: UnsupportedOperationException) {
+                    //CustomTabsServiceConnection 지원 브라우저가 없을 때 예외처리
                 }
-            }
-        } else {
-            // 카카오톡 미설치: 웹 공유 사용 권장
-            // 웹 공유 예시 코드
-            val sharerUrl = WebSharerClient.instance.makeDefaultUrl(defaultList)
 
-            // CustomTabs으로 웹 브라우저 열기
-
-            // 1. CustomTabsServiceConnection 지원 브라우저 열기
-            // ex) Chrome, 삼성 인터넷, FireFox, 웨일 등
-            try {
-                KakaoCustomTabsClient.openWithDefault(this, sharerUrl)
-            } catch(e: UnsupportedOperationException) {
-                // CustomTabsServiceConnection 지원 브라우저가 없을 때 예외처리
-            }
-
-            // 2. CustomTabsServiceConnection 미지원 브라우저 열기
-            // ex) 다음, 네이버 등
-            try {
-                KakaoCustomTabsClient.open(this, sharerUrl)
-            } catch (e: ActivityNotFoundException) {
-                // 디바이스에 설치된 인터넷 브라우저가 없을 때 예외처리
+                // 2. CustomTabsServiceConnection 미지원 브라우저 열기
+                // ex) 다음, 네이버 등
+                try {
+                    KakaoCustomTabsClient.open(this, sharerUrl)
+                } catch (e: ActivityNotFoundException) {
+                    // 디바이스에 설치된 인터넷 브라우저가 없을 때 예외처리
+                    Log.d("TkakaoAG", "인터넷 브라우저가 없음")
+                }
             }
         }
+
     }
-//    private fun sendKakaoLink() {
-//        val defaultFeed = FeedTemplate(
-//            content = Content(
-//                title = "제목",
-//                description = Title,
-//                imageUrl = "https://mud-kage.kakao.com/dn/Q2iNx/btqgeRgV54P/VLdBs9cvyn8BJXB3o7N8UK/kakaolink40_original.png",
-//                link = Link(
-//                    androidExecutionParams = mapOf("type" to "6", "route" to "main", "data" to "data")
-//                )
-//                // 콘텐츠를 클릭했을 때
-//            ),
-//            buttons = listOf(
-//                Button(
-//                    "자세히 보기",
-//                    Link(
-//                        androidExecutionParams = mapOf("type" to "6", "route" to "main", "data" to "data")
-//                    )
-//                )
-//                //버튼을 클릭했을 때
-//            )
-//        )
-//        if (ShareClient.instance.isKakaoTalkSharingAvailable(requireActivity())) {
-//            // 카카오톡으로 카카오톡 공유 가능
-//            ShareClient.instance.shareDefault(requireActivity(), defaultFeed) { sharingResult, error ->
-//                if (error != null) {
-//                    Timber.e( "카카오톡 공유 실패", error)
-//                }
-//                else if (sharingResult != null) {
-//                    Timber.d( "카카오톡 공유 성공 ${sharingResult.intent}")
-//                    startActivity(sharingResult.intent)
-//
-//                    // 카카오톡 공유에 성공했지만 아래 경고 메시지가 존재할 경우 일부 컨텐츠가 정상 동작하지 않을 수 있습니다.
-//                    Timber.w( "Warning Msg: ${sharingResult.warningMsg}")
-//                    Timber.w("Argument Msg: ${sharingResult.argumentMsg}")
-//                }
-//            }
-//        } else {
-//            // 카카오톡 미설치: 웹 공유 사용 권장
-//            // 웹 공유 예시 코드
-//            val sharerUrl = WebSharerClient.instance.makeDefaultUrl(defaultFeed)
-//
-//            // CustomTabs으로 웹 브라우저 열기
-//
-//            // 1. CustomTabsServiceConnection 지원 브라우저 열기
-//            // ex) Chrome, 삼성 인터넷, FireFox, 웨일 등
-//            try {
-//                KakaoCustomTabsClient.openWithDefault(requireActivity(), sharerUrl)
-//            } catch(e: UnsupportedOperationException) {
-//                // CustomTabsServiceConnection 지원 브라우저가 없을 때 예외처리
-//            }
-//
-//            // 2. CustomTabsServiceConnection 미지원 브라우저 열기
-//            // ex) 다음, 네이버 등
-//            try {
-//                KakaoCustomTabsClient.open(requireActivity(), sharerUrl)
-//            } catch (e: ActivityNotFoundException) {
-//                // 디바이스에 설치된 인터넷 브라우저가 없을 때 예외처리
-//            }
-//        }
-//    }
 }
 
 
