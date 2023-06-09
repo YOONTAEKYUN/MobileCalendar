@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MobileCalendar</string>
+    <string name="Month">MONTH</string>
+    <string name="Week">WEEK</string>
 </resources>
