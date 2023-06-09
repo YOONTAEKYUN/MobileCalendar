@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "216939323665",
+    "project_id": "mobilecalander-1824a",
+    "storage_bucket": "mobilecalander-1824a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:216939323665:android:518273670628b8db88acb0",
+        "android_client_info": {
+          "package_name": "com.example.mobilecalendar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "216939323665-k91s627ne8as0hcfeslnmdkq1fedekqv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoKED_lECEYxx-QPPDMFRl2CSpCgpNdfg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "216939323665-k91s627ne8as0hcfeslnmdkq1fedekqv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
