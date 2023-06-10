@@ -4,4 +4,6 @@
     <string name="kakao_scheme" translatable="false">kakaod8367dfc6b6fca4bf3dfb2b5ee5fcc4c</string>
     <string name="kakao_share_app_key" translatable="false">d8367dfc6b6fca4bf3dfb2b5ee5fcc4c</string>
 
+    <string name="Month">MONTH</string>
+    <string name="Week">WEEK</string>
 </resources>

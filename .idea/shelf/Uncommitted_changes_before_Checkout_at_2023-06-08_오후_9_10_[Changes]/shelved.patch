@@ -1,0 +1,47 @@
+Index: app/src/main/java/com/example/mobilecalendar/DayViewContainer.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.mobilecalendar\r\n\r\nimport android.view.View\r\nimport android.widget.TextView\r\nimport com.example.mobilecalendar.databinding.CalendarDayLayoutBinding\r\nimport com.kizitonwose.calendar.view.ViewContainer\r\n\r\nclass DayViewContainer(view: View) : ViewContainer(view) {\r\n    //val textView = view.findViewById<TextView>(R.id.calendarDayText)\r\n\r\n    // With ViewBinding\r\n    val textView = CalendarDayLayoutBinding.bind(view).calendarDayText\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/mobilecalendar/DayViewContainer.kt b/app/src/main/java/com/example/mobilecalendar/DayViewContainer.kt
+--- a/app/src/main/java/com/example/mobilecalendar/DayViewContainer.kt	(revision 994fb93adf230cdca985b9d8a3bc2dbb35fd1e0f)
++++ b/app/src/main/java/com/example/mobilecalendar/DayViewContainer.kt	(date 1686224439037)
+@@ -10,4 +10,5 @@
+ 
+     // With ViewBinding
+     val textView = CalendarDayLayoutBinding.bind(view).calendarDayText
++
+ }
+\ No newline at end of file
+Index: .idea/.gitignore
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+deleted file mode 100644
+--- a/.idea/.gitignore	(revision 994fb93adf230cdca985b9d8a3bc2dbb35fd1e0f)
++++ /dev/null	(revision 994fb93adf230cdca985b9d8a3bc2dbb35fd1e0f)
+@@ -1,3 +0,0 @@
+-# Default ignored files
+-/shelf/
+-/workspace.xml
+Index: .idea/gradle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"GradleMigrationSettings\" migrationVersion=\"1\" />\r\n  <component name=\"GradleSettings\">\r\n    <option name=\"linkedExternalProjectsSettings\">\r\n      <GradleProjectSettings>\r\n        <option name=\"testRunner\" value=\"GRADLE\" />\r\n        <option name=\"distributionType\" value=\"DEFAULT_WRAPPED\" />\r\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\r\n        <option name=\"modules\">\r\n          <set>\r\n            <option value=\"$PROJECT_DIR$\" />\r\n            <option value=\"$PROJECT_DIR$/app\" />\r\n          </set>\r\n        </option>\r\n      </GradleProjectSettings>\r\n    </option>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/gradle.xml b/.idea/gradle.xml
+--- a/.idea/gradle.xml	(revision 994fb93adf230cdca985b9d8a3bc2dbb35fd1e0f)
++++ b/.idea/gradle.xml	(date 1686212737770)
+@@ -1,6 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+-  <component name="GradleMigrationSettings" migrationVersion="1" />
+   <component name="GradleSettings">
+     <option name="linkedExternalProjectsSettings">
+       <GradleProjectSettings>
+diff --git a/app/src/test/java/com/example/mobilecalendar/ExampleUnitTest.kt b/app/androidTest/ExampleUnitTest.kt
+rename from app/src/test/java/com/example/mobilecalendar/ExampleUnitTest.kt
+rename to app/androidTest/ExampleUnitTest.kt

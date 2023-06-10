@@ -1,6 +1,5 @@
 package com.example.mobilecalendar
 
-import android.content.ActivityNotFoundException
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -43,18 +42,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
-            // Called only when a new container is needed.
-            override fun create(view: View) = DayViewContainer(view)
-
-            // Called every time we need to reuse a container.
-            override fun bind(container: DayViewContainer, data: CalendarDay) {
-                container.textView.text = data.date.dayOfMonth.toString()
-
-            }
+        binding.month.setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.frag_view, MonthFrag())
+                .commit()
         }
-
+        binding.week.setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.frag_view, WeekFrag())
+                .commit()
+        }
         val currentMonth = YearMonth.now()
         val startMonth = currentMonth.minusMonths(100)  // Adjust as needed
         val endMonth = currentMonth.plusMonths(100)  // Adjust as needed
