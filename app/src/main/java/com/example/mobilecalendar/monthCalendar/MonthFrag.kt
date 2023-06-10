@@ -1,4 +1,4 @@
-package com.example.mobilecalendar
+package com.example.mobilecalendar.monthCalendar
 
 import android.app.AlertDialog
 import android.graphics.Color
@@ -9,12 +9,18 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
+import com.example.mobilecalendar.DayViewContainer
+import com.example.mobilecalendar.R
 import com.example.mobilecalendar.databinding.MonthLayoutBinding
+import com.example.mobilecalendar.roomdb.AppDatabase
+import com.example.mobilecalendar.roomdb.Schedule
 import com.example.mobilecalendar.shared.displayText
 import com.kizitonwose.calendar.core.*
 import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -30,13 +36,25 @@ class MonthViewContainer(view: View) : ViewContainer(view) {
 class MonthFrag : Fragment() {
     private lateinit var binding: MonthLayoutBinding
     private var selectedDate: LocalDate? = null
-
     private fun showModal(date: LocalDate) {
         val modalLayout = LayoutInflater.from(requireContext()).inflate(R.layout.modal_layout, null)
-
-        // 모달 레이아웃에 날짜 정보 설정
         val dateTextView = modalLayout.findViewById<TextView>(R.id.dateTextView)
         dateTextView.text = date.toString()
+
+        // RecyclerView를 찾습니다.
+        val scheduleRecyclerView = modalLayout.findViewById<RecyclerView>(R.id.scheduleRecyclerView)
+
+        // ScheduleDAO를 사용하여 해당 날짜의 일정 데이터를 가져옵니다.
+        val scheduleDAO = AppDatabase.getInstance(requireContext()).scheduleDao()
+        var scheduleList: List<Schedule> = emptyList()
+        runBlocking {
+            scheduleList = scheduleDAO.getSchedulesByDate(date)
+        }
+
+        // 기존의 ScheduleAdapter를 사용하여 RecyclerView에 표시합니다.
+        val scheduleAdapter = ScheduleAdapter(scheduleList.toMutableList())
+        scheduleRecyclerView.adapter = scheduleAdapter
+
         // 다이얼로그로 모달 레이아웃 표시
         val dialog = AlertDialog.Builder(requireContext())
             .setView(modalLayout)
@@ -67,7 +85,32 @@ class MonthFrag : Fragment() {
                 } else {
                     container.textView.setTextColor(Color.GRAY)
                 }
-
+                //날짜 클릭 시 이벤트 리스너 설정
+                container.textView.setOnClickListener {
+                    if (data.position == DayPosition.MonthDate) {
+                        val currentSelection = selectedDate
+                        if (currentSelection == data.date) {
+                            // If the user clicks the same date, clear selection.
+                            selectedDate = null
+                            // Reload this date so the dayBinder is called
+                            // and we can REMOVE the selection background.
+                            binding.calendarView.notifyDateChanged(currentSelection)
+                        } else {
+                            selectedDate = data.date
+                            // Reload the newly selected date so the dayBinder is
+                            // called and we can ADD the selection background.
+                            binding.calendarView.notifyDateChanged(data.date)
+                            if (currentSelection != null) {
+                                // We need to also reload the previously selected
+                                // date so we can REMOVE the selection background.
+                                binding.calendarView.notifyDateChanged(currentSelection)
+                            }
+                            // 모달 표시
+                            showModal(data.date)
+                        }
+                    }
+                }
+                // 클릭 이벤트 리스너
                 view.setOnClickListener {
                     if (data.position == DayPosition.MonthDate) {
                         val currentSelection = selectedDate

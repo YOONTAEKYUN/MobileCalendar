@@ -3,6 +3,8 @@ package com.example.mobilecalendar
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.mobilecalendar.databinding.ActivityMainBinding
+import com.example.mobilecalendar.monthCalendar.MonthFrag
+import com.example.mobilecalendar.weekCalendar.WeekFrag
 
 
 class MainActivity : AppCompatActivity() {

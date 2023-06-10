@@ -1,4 +1,4 @@
-package com.example.mobilecalendar
+package com.example.mobilecalendar.weekCalendar
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
+import com.example.mobilecalendar.DayViewContainer
 import com.example.mobilecalendar.databinding.WeekLayoutBinding
 import com.kizitonwose.calendar.core.*
 import com.kizitonwose.calendar.view.WeekDayBinder
