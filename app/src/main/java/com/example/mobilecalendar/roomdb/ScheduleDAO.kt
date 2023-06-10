@@ -13,10 +13,15 @@ interface ScheduleDAO {
     @Delete
     suspend fun deleteSchedule(schedule: Schedule)
 
+
     @Query("SELECT * FROM Schedule")
     suspend fun getAllSchedules(): List<Schedule>
 
     @Query("SELECT * FROM Schedule WHERE id = :scheduleId")
     suspend fun getScheduleById(scheduleId: Int): Schedule
+
+    @Query("DELETE FROM Schedule")
+    suspend fun deleteAllSchedules()
+
 
 }

@@ -1,5 +1,6 @@
 package com.example.mobilecalendar
 
+import android.content.ActivityNotFoundException
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,7 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.example.mobilecalendar.databinding.ActivityMainBinding
+import com.example.mobilecalendar.databinding.MonthLayoutBinding
 import com.example.mobilecalendar.roomdb.Alarm
 import com.example.mobilecalendar.roomdb.AppDatabase
 import com.example.mobilecalendar.roomdb.Schedule
@@ -29,6 +31,8 @@ import com.kakao.sdk.template.model.FeedTemplate
 import com.kakao.sdk.template.model.Link
 import com.kakao.sdk.template.model.ListTemplate
 import com.kakao.sdk.common.util.Utility
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 // 디버그 키 해시 : yzXmrPCP5gi9Nt0gJOplguL51Sc=
 // 릴리즈 키 해시 : nZfccoI3KzCvTHynSMOxiSTBwXE=
@@ -37,95 +41,41 @@ import com.kakao.sdk.common.util.Utility
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        binding.month.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.frag_view, MonthFrag())
-                .commit()
-        }
-        binding.week.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.frag_view, WeekFrag())
-                .commit()
-        }
-        val currentMonth = YearMonth.now()
-        val startMonth = currentMonth.minusMonths(100)  // Adjust as needed
-        val endMonth = currentMonth.plusMonths(100)  // Adjust as needed
-        val firstDayOfWeek = firstDayOfWeekFromLocale() // Available from the library
-        binding.calendarView.setup(startMonth, endMonth, firstDayOfWeek)
-        binding.calendarView.scrollToMonth(currentMonth)
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
-
-            // Get new FCM registration token
-            val token = task.result
-
-            // Log and toast
-            Log.d("token : ", token)
-        })
-
+    //카카오톡 메시지 공유 api, list 템플릿
+    suspend fun retrieveDefaultList(): ListTemplate {
         val db = AppDatabase.getInstance(applicationContext)
         val scheduleDao = db.scheduleDao()
-        val alarmDao = db.AlarmDAO()
-        val schedule = Schedule(title = "스케줄 제목", date = LocalDate.now(), place="서울", time = LocalTime.now())
-        lifecycleScope.launch {
-            val insertedId = scheduleDao.insertSchedule(schedule)
-            // 삽입된 스케줄의 식별자를 사용할 수 있습니다.
+        val schedules = withContext(Dispatchers.IO) {
+            scheduleDao.getAllSchedules()
         }
-        lifecycleScope.launch {
-            val schedules = scheduleDao.getAllSchedules()
-            for (schedule in schedules) {
-                Log.d("Schedule", "Title: ${schedule.title}, Date: ${schedule.date}, Time: ${schedule.time}")
-            }
+        //content 내용은 최대 3개 표시 가능, 최소 2개 이상 있어야 함
+        val contents = schedules.map { schedule ->
+            Content(
+                title = schedule.title,
+                description = schedule.date.toString(),
+                imageUrl = "https://mud-kage.kakao.com/dn/bDPMIb/btqgeoTRQvd/49BuF1gNo6UXkdbKecx600/kakaolink40_original.png",
+                link = Link(
+                    webUrl = "https://developers.kakao.com",
+                    mobileWebUrl = "https://developers.kakao.com"
+                )
+            )
         }
-
-        // 카카오 api 사용을 위한 릴리즈 해시키 확인
-        var keyHash = Utility.getKeyHash(this)
-        Log.d("hash", keyHash.toString())
-        //카카오톡 메시지 공유 api, list 템플릿
-        val defaultList = ListTemplate(
-            headerTitle = "WEEKLY MAGAZINE",
+        // 로그로 contents 내용 출력
+        contents.forEachIndexed { index, content ->
+            println("Content ${index + 1}:")
+            println("Title: ${content.title}")
+            println("Description: ${content.description}")
+            //println("ImageUrl: ${content.imageUrl}")
+            //println("Link: ${content.link}")
+            println()
+        }
+        return ListTemplate(
+            headerTitle = "스케줄 리스트",
             headerLink = Link(
                 webUrl = "https://developers.kakao.com",
                 mobileWebUrl = "https://developers.kakao.com"
             ),
-            contents = listOf(
-                Content(
-                    title = "취미의 특징, 탁구",
-                    description = "스포츠",
-                    imageUrl = "https://mud-kage.kakao.com/dn/bDPMIb/btqgeoTRQvd/49BuF1gNo6UXkdbKecx600/kakaolink40_original.png",
-                    link = Link(
-                        webUrl = "https://developers.kakao.com",
-                        mobileWebUrl = "https://developers.kakao.com"
-                    )
-                ),
-                Content(
-                    title = "크림으로 이해하는 커피이야기",
-                    description = "음식",
-                    imageUrl = "https://mud-kage.kakao.com/dn/QPeNt/btqgeSfSsCR/0QJIRuWTtkg4cYc57n8H80/kakaolink40_original.png",
-                    link = Link(
-                        webUrl = "https://developers.kakao.com",
-                        mobileWebUrl = "https://developers.kakao.com"
-                    )
-                ),
-                Content(
-                    title = "감성이 가득한 분위기",
-                    description = "사진",
-                    imageUrl = "https://mud-kage.kakao.com/dn/c7MBX4/btqgeRgWhBy/ZMLnndJFAqyUAnqu4sQHS0/kakaolink40_original.png",
-                    link = Link(
-                        webUrl = "https://developers.kakao.com",
-                        mobileWebUrl = "https://developers.kakao.com"
-                    )
-                )
-            ),
+            contents = contents,
             buttons = listOf(
                 Button(
                     "웹으로 보기",
@@ -143,51 +93,120 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         )
+    }
+    suspend fun allDelete(){
+        val db = AppDatabase.getInstance(applicationContext)
+        val scheduleDao = db.scheduleDao()
+        scheduleDao.deleteAllSchedules() //schedule 테이블 전체 삭제
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // 카카오톡으로 데이터를 리스트 형식으로 공유하는 기능
-        // 임시로 공유 버튼 추가
-        binding.testButton.setOnClickListener {
-            // 카카오톡 설치여부 확인
-            if (ShareClient.instance.isKakaoTalkSharingAvailable(this)) {
-                // 카카오톡으로 카카오톡 공유 가능
-                ShareClient.instance.shareDefault(this, defaultList) { sharingResult, error ->
-                    if (error != null) {
-                        Log.e("kakao", "카카오톡 공유 실패", error)
+        binding.month.setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.frag_view, MonthFrag())
+                .commit()
+        }
+        binding.week.setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.frag_view, WeekFrag())
+                .commit()
+        }
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+
+            // Log and toast
+            Log.d("token : ", token)
+        })
+
+        val db = AppDatabase.getInstance(applicationContext)
+        val scheduleDao = db.scheduleDao()
+        val alarmDao = db.AlarmDAO()
+
+        binding.sendButton.setOnClickListener {
+            lifecycleScope.launch {
+                scheduleDao.insertSchedule(
+                    Schedule(
+                        title = binding.title.text.toString(),
+                        date = LocalDate.now(),
+                        place = binding.place.text.toString(),
+                        time = LocalTime.now()
+                    )
+                )
+            }
+            Toast.makeText(this, "일정 추가 완료", Toast.LENGTH_SHORT).show()
+            binding.title.setText("")
+            binding.place.setText("")
+        }
+
+        lifecycleScope.launch {
+            val defaultList = retrieveDefaultList()
+            binding.testButton.setOnClickListener {
+                // 카카오톡 설치여부 확인
+                if (ShareClient.instance.isKakaoTalkSharingAvailable(this@MainActivity)) {
+
+                    // 카카오톡으로 카카오톡 공유 가능
+                    defaultList?.let { it1 ->
+                        ShareClient.instance.shareDefault(this@MainActivity, it1) { sharingResult, error ->
+                            if (error != null) {
+                                Log.e("kakao", "카카오톡 공유 실패", error)
+                            } else if (sharingResult != null) {
+                                Log.d("kakao", "카카오톡 공유 성공 ${sharingResult.intent}")
+                                startActivity(sharingResult.intent)
+
+                                // 카카오톡 공유에 성공했지만 아래 경고 메시지가 존재할 경우 일부 컨텐츠가 정상 동작하지 않을 수 있습니다.
+                                Log.w("kakao", "Warning Msg: ${sharingResult.warningMsg}")
+                                Log.w("kakao", "Argument Msg: ${sharingResult.argumentMsg}")
+                            }
+                        }
                     }
-                    else if (sharingResult != null) {
-                        Log.d("kakao", "카카오톡 공유 성공 ${sharingResult.intent}")
-                        startActivity(sharingResult.intent)
-
-                        // 카카오톡 공유에 성공했지만 아래 경고 메시지가 존재할 경우 일부 컨텐츠가 정상 동작하지 않을 수 있습니다.
-                        Log.w("kakao", "Warning Msg: ${sharingResult.warningMsg}")
-                        Log.w("kakao", "Argument Msg: ${sharingResult.argumentMsg}")
+                } else {
+                    // 카카오톡 미설치: 웹 공유 사용 권장
+                    // 웹 공유 예시 코드
+                    val sharerUrl = defaultList?.let { it1 ->
+                        WebSharerClient.instance.makeDefaultUrl(
+                            it1
+                        )
                     }
-                }
-            } else {
-                // 카카오톡 미설치: 웹 공유 사용 권장
-                // 웹 공유 예시 코드
-                val sharerUrl = WebSharerClient.instance.makeDefaultUrl(defaultList)
+                    // CustomTabs으로 웹 브라우저 열기
 
-                // CustomTabs으로 웹 브라우저 열기
+                    // 1. CustomTabsServiceConnection 지원 브라우저 열기
+                    // ex) Chrome, 삼성 인터넷, FireFox, 웨일 등
+                    try {
+                        if (sharerUrl != null) {
+                            KakaoCustomTabsClient.openWithDefault(this@MainActivity, sharerUrl)
+                        }
+                    } catch(e: UnsupportedOperationException) {
+                        //CustomTabsServiceConnection 지원 브라우저가 없을 때 예외처리
+                    }
 
-                // 1. CustomTabsServiceConnection 지원 브라우저 열기
-                // ex) Chrome, 삼성 인터넷, FireFox, 웨일 등
-                try {
-                    //KakaoCustomTabsClient.openWithDefault(this, sharerUrl)
-                } catch(e: UnsupportedOperationException) {
-                    //CustomTabsServiceConnection 지원 브라우저가 없을 때 예외처리
-                }
-
-                // 2. CustomTabsServiceConnection 미지원 브라우저 열기
-                // ex) 다음, 네이버 등
-                try {
-                    KakaoCustomTabsClient.open(this, sharerUrl)
-                } catch (e: ActivityNotFoundException) {
-                    // 디바이스에 설치된 인터넷 브라우저가 없을 때 예외처리
-                    Log.d("TkakaoAG", "인터넷 브라우저가 없음")
+                    // 2. CustomTabsServiceConnection 미지원 브라우저 열기
+                    // ex) 다음, 네이버 등
+                    try {
+                        if (sharerUrl != null) {
+                            KakaoCustomTabsClient.open(this@MainActivity, sharerUrl)
+                        }
+                    } catch (e: ActivityNotFoundException) {
+                        // 디바이스에 설치된 인터넷 브라우저가 없을 때 예외처리
+                        Log.d("kakao", "인터넷 브라우저가 없음")
+                    }
                 }
             }
+
         }
+
+
+//        // 카카오 api 사용을 위한 릴리즈 해시키 확인
+//        var keyHash = Utility.getKeyHash(this)
+//        Log.d("hash", keyHash.toString())
 
     }
 }

@@ -3,6 +3,7 @@ package com.example.mobilecalendar
 import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,7 +34,7 @@ class MonthFrag : Fragment() {
 
     private fun showModal(date: LocalDate) {
         val modalLayout = LayoutInflater.from(requireContext()).inflate(R.layout.modal_layout, null)
-
+        Log.d("layout", modalLayout.toString())
         // 모달 레이아웃에 날짜 정보 설정
         val dateTextView = modalLayout.findViewById<TextView>(R.id.dateTextView)
         dateTextView.text = date.toString()
