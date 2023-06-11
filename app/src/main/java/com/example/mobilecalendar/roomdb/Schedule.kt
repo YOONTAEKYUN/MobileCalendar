@@ -7,11 +7,11 @@ import java.time.LocalTime
 
 @Entity
 data class Schedule (
-    val title: String,
+    var title: String,
     val date: LocalDate,
-    val place: String,
-    val start_time: LocalTime,
-    val end_time: LocalTime
+    var place: String,
+    var start_time: LocalTime,
+    var end_time: LocalTime
 ){
     @PrimaryKey(autoGenerate = true) var id: Long = 0
 }

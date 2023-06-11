@@ -18,7 +18,7 @@ interface ScheduleDAO {
     suspend fun getAllSchedules(): List<Schedule>
 
     @Query("SELECT * FROM Schedule WHERE id = :scheduleId")
-    suspend fun getScheduleById(scheduleId: Int): Schedule
+    suspend fun getScheduleById(scheduleId: kotlin.Long): Schedule
 
     @Query("DELETE FROM Schedule")
     suspend fun deleteAllSchedules()

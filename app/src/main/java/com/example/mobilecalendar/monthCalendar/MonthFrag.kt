@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobilecalendar.DayViewContainer
 import com.example.mobilecalendar.R
+import com.example.mobilecalendar.ScheduleDetailActivity
 import com.example.mobilecalendar.SetAlarmActivity
 import com.example.mobilecalendar.databinding.MonthLayoutBinding
 import com.example.mobilecalendar.roomdb.AppDatabase
@@ -212,6 +213,16 @@ class MonthFrag : Fragment() {
             scheduleAdapter.updateScheduleList(scheduleList)
             scheduleRecyclerView.adapter = scheduleAdapter
         }
+
+        scheduleAdapter.setOnItemClickListener(object : ScheduleAdapter.OnItemClickListner {
+            override fun onItemClick(schedule: Schedule) {
+                // 여기서 아이템 클릭 이벤트를 처리합니다.
+                // 예를 들어, 스케줄의 상세 보기를 위한 새로운 액티비티를 시작할 수 있습니다.
+                val intent = Intent(requireContext(), ScheduleDetailActivity::class.java)
+                intent.putExtra("scheduleId", schedule.id) // 스케줄 id를 상세 보기 액티비티로 전달합니다.
+                startActivity(intent)
+            }
+        })
 
         // 다이얼로그로 모달 레이아웃 표시
         val dialog = AlertDialog.Builder(requireContext())

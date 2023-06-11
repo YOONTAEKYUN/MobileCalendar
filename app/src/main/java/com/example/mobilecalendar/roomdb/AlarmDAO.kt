@@ -14,6 +14,8 @@ interface AlarmDAO {
     suspend fun deleteAlarm(alarm: Alarm)
 
     @Query("SELECT * FROM Alarm WHERE scheduleId = :scheduleId")
-    suspend fun getAlarmForSchedule(scheduleId: Long): List<Alarm>
+    suspend fun getAlarmForSchedule(scheduleId: Long): Alarm
+    @Query("UPDATE Alarm SET message = :newMessage WHERE id = :alarmId")
+    suspend fun updateAlarmMessage(alarmId: Int, newMessage: String)
 
 }

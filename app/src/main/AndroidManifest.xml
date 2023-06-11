@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <!--queries에 카카오톡 패키지 추가-->
+    <!-- queries에 카카오톡 패키지 추가 -->
     <queries>
         <package android:name="com.kakao.talk" />
     </queries>
@@ -20,8 +20,9 @@
         android:theme="@style/Theme.MobileCalendar"
         android:hardwareAccelerated="true"
         tools:targetApi="31">
-
-
+        <activity
+            android:name=".ScheduleDetailActivity"
+            android:exported="false" />
         <activity
             android:name=".view.EditTodoActivity"
             android:exported="false" />

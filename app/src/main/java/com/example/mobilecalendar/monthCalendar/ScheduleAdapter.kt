@@ -19,7 +19,7 @@ class ScheduleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 }
 
 class ScheduleAdapter(private val schedules: MutableList<Schedule>) : RecyclerView.Adapter<ScheduleViewHolder>() {
-
+    private lateinit var itemClickListner: OnItemClickListner
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.modal_item, parent, false)
         return ScheduleViewHolder(view)
@@ -46,4 +46,24 @@ class ScheduleAdapter(private val schedules: MutableList<Schedule>) : RecyclerVi
         schedules.addAll(newSchedules)
         notifyDataSetChanged()
     }
+
+    interface OnItemClickListner{
+        fun onItemClick(schedule: Schedule)
+    }
+    fun setOnItemClickListener(listner: OnItemClickListner){
+        itemClickListner = listner
+    }
+
+    override fun onBindViewHolder(
+        holder: ScheduleViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        super.onBindViewHolder(holder, position, payloads)
+        holder.itemView.setOnClickListener {
+            val  schedule = schedules[position]
+            itemClickListner.onItemClick(schedule)
+        }
+    }
+
 }
