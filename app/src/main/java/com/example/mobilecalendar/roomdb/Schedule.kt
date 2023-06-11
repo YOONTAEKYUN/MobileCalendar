@@ -12,5 +12,5 @@ data class Schedule (
     val place: String,
     val time: LocalTime
 ){
-    @PrimaryKey(autoGenerate = true) var id: Int = 0
+    @PrimaryKey(autoGenerate = true) var id: Long = 0
 }

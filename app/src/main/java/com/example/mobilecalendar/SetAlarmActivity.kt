@@ -81,7 +81,7 @@ class SetAlarmActivity : AppCompatActivity() {
 
         binding.confirmButton.setOnClickListener {
             lifecycleScope.launch {
-                scheduleDao.insertSchedule(
+                val scheduleId = scheduleDao.insertSchedule(
                     Schedule(
                         title = inputAlarmTitle.text.toString(),
                         date = selectedLocalDate,
@@ -91,7 +91,7 @@ class SetAlarmActivity : AppCompatActivity() {
                 )
                 alarmDao.insertAlarm(
                     Alarm(
-                        scheduleId = 1,
+                        scheduleId = scheduleId,
                         title = inputAlarmTitle.text.toString(),
                         message = inputAlarmContent.text.toString(),
                         time = currentTime,
@@ -99,29 +99,26 @@ class SetAlarmActivity : AppCompatActivity() {
                     )
                 )
             }
-            val title = inputAlarmTitle.text.toString()
-            val content = inputAlarmContent.text.toString()
-            // 설정한 시간과 앱 내 시간과 같으면 알림 발생
-            if(LocalTime.now().hour == currentTime.hour && LocalTime.now().minute == currentTime.minute){
-                if(title.isNotEmpty() && content.isNotEmpty()){
-                    // 저장된 텍스트로 알림 발생
-                    val norificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                    norificationManager.notify(1, buildNotification(title, content))
-                }else{
-                    Toast.makeText(this, "제목과 내용을 입력해주세요", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-
-
-
             Toast.makeText(this, "일정 추가 완료", Toast.LENGTH_SHORT).show()
             binding.inputAlarmTitle.setText("")
             binding.inputAlarmLocation.setText("")
+            binding.inputAlarmContent.setText("")
 
         }
-        binding.cancleButton.setOnClickListener{
+        binding.cancleButton.setOnClickListener{//닫기 버튼
             finish() // 창 닫기
+        }
+        val title = inputAlarmTitle.text.toString()
+        val content = inputAlarmContent.text.toString()
+        // 설정한 시간과 앱 내 시간과 같으면 알림 발생
+        if(LocalTime.now().hour == currentTime.hour && LocalTime.now().minute == currentTime.minute){
+            if(title.isNotEmpty() && content.isNotEmpty()){
+                // 저장된 텍스트로 알림 발생
+                val norificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                norificationManager.notify(1, buildNotification(title, content))
+            }else{
+                Toast.makeText(this, "제목과 내용을 입력해주세요", Toast.LENGTH_SHORT).show()
+            }
         }
 
 

@@ -41,11 +41,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="저장" />
-        <Button
-            android:id="@+id/kakaoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="공유" />
     </LinearLayout>
 
 

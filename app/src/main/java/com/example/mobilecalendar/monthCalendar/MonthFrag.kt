@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -54,11 +55,13 @@ class MonthFrag : Fragment() {
     private lateinit var binding: MonthLayoutBinding
     private var selectedDate: LocalDate? = null
 
-    suspend fun retrieveDefaultList(): ListTemplate {
+    suspend fun retrieveDefaultList(date: LocalDate): ListTemplate? {
+        Log.d("date", date.toString())
         val db = AppDatabase.getInstance(requireContext())
         val scheduleDao = db.scheduleDao()
         val schedules = withContext(Dispatchers.IO) {
-            scheduleDao.getAllSchedules()
+            //scheduleDao.getAllSchedules() //현재는 모든 스케줄을 가져오도록 설정했지만 해당 날짜에 따라 가져오도록 변경해야함
+            scheduleDao.getSchedulesByDate(date)
         }
         //주의 : content 내용은 최대 3개 표시 가능, 최소 2개 이상 있어야 함
         val contents = schedules.map { schedule ->
@@ -71,6 +74,9 @@ class MonthFrag : Fragment() {
                     mobileWebUrl = "https://developers.kakao.com"
                 )
             )
+        }
+        if(contents.size < 2){
+            return null
         }
         // 로그로 contents 내용 출력
         contents.forEachIndexed { index, content ->
@@ -118,7 +124,6 @@ class MonthFrag : Fragment() {
         val dateTextView = modalLayout.findViewById<TextView>(R.id.dateTextView)
         dateTextView.text = date.toString()
 
-
         // "+ 버튼" 초기화
         val addButton = modalLayout.findViewById<Button>(R.id.add_button)
         addButton.setOnClickListener {
@@ -128,61 +133,64 @@ class MonthFrag : Fragment() {
             intent.putExtra("selectedDate", date.toString()) // 선택된 날짜를 인텐트에 추가
             startActivity(intent)
         }
+        // 일정 공유 버튼 눌렀을 때
         val shareButton = modalLayout.findViewById<Button>(R.id.share_button)
         lifecycleScope.launch {
-            val defaultList = retrieveDefaultList()
+            val defaultList = retrieveDefaultList(date)
             shareButton.setOnClickListener {
-                // 카카오톡 설치여부 확인
-                if (ShareClient.instance.isKakaoTalkSharingAvailable(requireContext())) {
+                if (defaultList != null){ //일정이 없거나 2개보다 적으면 공유 불가
+                    // 카카오톡 설치여부 확인
+                    if (ShareClient.instance.isKakaoTalkSharingAvailable(requireContext())) {
+                        // 카카오톡으로 카카오톡 공유 가능
+                        defaultList?.let { it1 ->
+                            ShareClient.instance.shareDefault(requireContext(), it1) { sharingResult, error ->
+                                if (error != null) {
+                                    Log.e("kakao", "카카오톡 공유 실패", error)
+                                } else if (sharingResult != null) {
+                                    Log.d("kakao", "카카오톡 공유 성공 ${sharingResult.intent}")
+                                    startActivity(sharingResult.intent)
 
-                    // 카카오톡으로 카카오톡 공유 가능
-                    defaultList?.let { it1 ->
-                        ShareClient.instance.shareDefault(requireContext(), it1) { sharingResult, error ->
-                            if (error != null) {
-                                Log.e("kakao", "카카오톡 공유 실패", error)
-                            } else if (sharingResult != null) {
-                                Log.d("kakao", "카카오톡 공유 성공 ${sharingResult.intent}")
-                                startActivity(sharingResult.intent)
-
-                                // 카카오톡 공유에 성공했지만 아래 경고 메시지가 존재할 경우 일부 컨텐츠가 정상 동작하지 않을 수 있습니다.
-                                Log.w("kakao", "Warning Msg: ${sharingResult.warningMsg}")
-                                Log.w("kakao", "Argument Msg: ${sharingResult.argumentMsg}")
+                                    // 카카오톡 공유에 성공했지만 아래 경고 메시지가 존재할 경우 일부 컨텐츠가 정상 동작하지 않을 수 있습니다.
+                                    Log.w("kakao", "Warning Msg: ${sharingResult.warningMsg}")
+                                    Log.w("kakao", "Argument Msg: ${sharingResult.argumentMsg}")
+                                }
                             }
                         }
-                    }
-                } else {
-                    // 카카오톡 미설치: 웹 공유 사용 권장
-                    // 웹 공유 예시 코드
-                    val sharerUrl = defaultList?.let { it1 ->
-                        WebSharerClient.instance.makeDefaultUrl(
-                            it1
-                        )
-                    }
-                    // CustomTabs으로 웹 브라우저 열기
-
-                    // 1. CustomTabsServiceConnection 지원 브라우저 열기
-                    // ex) Chrome, 삼성 인터넷, FireFox, 웨일 등
-                    try {
-                        if (sharerUrl != null) {
-                            KakaoCustomTabsClient.openWithDefault(requireContext(), sharerUrl)
+                    } else {
+                        // 카카오톡 미설치: 웹 공유 사용 권장
+                        // 웹 공유 예시 코드
+                        val sharerUrl = defaultList?.let { it1 ->
+                            WebSharerClient.instance.makeDefaultUrl(
+                                it1
+                            )
                         }
-                    } catch(e: UnsupportedOperationException) {
-                        //CustomTabsServiceConnection 지원 브라우저가 없을 때 예외처리
-                    }
-
-                    // 2. CustomTabsServiceConnection 미지원 브라우저 열기
-                    // ex) 다음, 네이버 등
-                    try {
-                        if (sharerUrl != null) {
-                            KakaoCustomTabsClient.open(requireContext(), sharerUrl)
+                        // CustomTabs으로 웹 브라우저 열기
+                        // 1. CustomTabsServiceConnection 지원 브라우저 열기
+                        // ex) Chrome, 삼성 인터넷, FireFox, 웨일 등
+                        try {
+                            if (sharerUrl != null) {
+                                KakaoCustomTabsClient.openWithDefault(requireContext(), sharerUrl)
+                            }
+                        } catch(e: UnsupportedOperationException) {
+                            //CustomTabsServiceConnection 지원 브라우저가 없을 때 예외처리
                         }
-                    } catch (e: ActivityNotFoundException) {
-                        // 디바이스에 설치된 인터넷 브라우저가 없을 때 예외처리
-                        Log.d("kakao", "인터넷 브라우저가 없음")
+
+                        // 2. CustomTabsServiceConnection 미지원 브라우저 열기
+                        // ex) 다음, 네이버 등
+                        try {
+                            if (sharerUrl != null) {
+                                KakaoCustomTabsClient.open(requireContext(), sharerUrl)
+                            }
+                        } catch (e: ActivityNotFoundException) {
+                            // 디바이스에 설치된 인터넷 브라우저가 없을 때 예외처리
+                            Log.d("kakao", "인터넷 브라우저가 없음")
+                        }
                     }
+                }else{
+                    Toast.makeText(requireContext(), "일정이 최솟값 보다 작아 조회하지 못합니다.", Toast.LENGTH_LONG).show()
                 }
-            }
 
+            }
         }
 
         // RecyclerView를 찾습니다.

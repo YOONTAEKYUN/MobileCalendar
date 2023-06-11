@@ -18,7 +18,7 @@ import java.time.LocalTime
 )
 
 data class Alarm(
-    val scheduleId: Int,
+    val scheduleId: Long,
     val title: String,
     val message: String,
     val time: LocalTime,

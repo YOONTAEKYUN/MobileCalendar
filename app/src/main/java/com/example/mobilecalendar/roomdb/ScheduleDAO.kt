@@ -6,7 +6,7 @@ import java.time.LocalDate
 @Dao
 interface ScheduleDAO {
     @Insert
-    suspend fun insertSchedule(schedule: Schedule): Long
+    suspend fun insertSchedule(schedule: Schedule): Long //Long에서 변경
 
     @Update
     suspend fun updateSchedule(schedule: Schedule)
