@@ -10,7 +10,8 @@ data class Schedule (
     val title: String,
     val date: LocalDate,
     val place: String,
-    val time: LocalTime
+    val start_time: LocalTime,
+    val end_time: LocalTime
 ){
     @PrimaryKey(autoGenerate = true) var id: Long = 0
 }

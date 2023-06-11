@@ -26,4 +26,7 @@ interface ScheduleDAO {
 
     @Query("SELECT * FROM Schedule WHERE date = :date")
     suspend fun getSchedulesByDate(date: LocalDate): List<Schedule>
+
+    @Query("SELECT * FROM Schedule WHERE date BETWEEN :start AND :end")
+    suspend fun getSchedulesByDate(start: LocalDate, end: LocalDate): List<Schedule>
 }

@@ -97,7 +97,8 @@ class SetAlarmActivity : AppCompatActivity() {
                         title = inputAlarmTitle.text.toString(),
                         date = selectedLocalDate,
                         place = inputAlarmLocation.text.toString(),
-                        time = LocalTime.now()
+                        start_time = LocalTime.now(),
+                        end_time = LocalTime.now()
                     )
                 )
                 alarmDao.insertAlarm(
