@@ -1,11 +1,13 @@
 package com.example.mobilecalendar.monthCalendar
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.view.children
@@ -13,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobilecalendar.DayViewContainer
 import com.example.mobilecalendar.R
+import com.example.mobilecalendar.SetAlarmActivity
 import com.example.mobilecalendar.databinding.MonthLayoutBinding
 import com.example.mobilecalendar.roomdb.AppDatabase
 import com.example.mobilecalendar.roomdb.Schedule
@@ -41,13 +44,24 @@ class MonthFrag : Fragment() {
     private fun showModal(date: LocalDate) {
         val modalLayout = LayoutInflater.from(requireContext()).inflate(R.layout.modal_layout, null)
 
+        // EditText 초기화
+        val editText = modalLayout.findViewById<EditText>(R.id.context_editText)
+        editText.visibility = View.VISIBLE
+
         // 모달 레이아웃에 날짜 정보 설정
         val dateTextView = modalLayout.findViewById<TextView>(R.id.dateTextView)
         dateTextView.text = date.toString()
 
-//        // EditText 초기화
-//        val editText = modalLayout.findViewById<EditText>(R.id.contextEditText)
-//        editText.hint = date.toString()
+
+        // "+ 버튼" 초기화
+        val addButton = modalLayout.findViewById<Button>(R.id.add_button)
+        addButton.setOnClickListener {
+            // "+ 버튼"을 클릭하면 새로운 화면이 뜨도록 처리
+            // TODO: 새로운 화면을 띄우고 EditText가 나오도록
+            val intent = Intent(requireContext(), SetAlarmActivity::class.java)
+            startActivity(intent)
+        }
+
 
         // RecyclerView를 찾습니다.
         val scheduleRecyclerView = modalLayout.findViewById<RecyclerView>(R.id.scheduleRecyclerView)

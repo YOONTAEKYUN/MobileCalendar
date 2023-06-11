@@ -39,6 +39,8 @@
                     android:scheme="@string/kakao_scheme" />
             </intent-filter>
         </activity>
+        <activity android:name=".SetAlarmActivity" />
+
         <!-- Kakao SDK 설정 -->
         <meta-data
             android:name="com.kakao.sdk.AppKey"
