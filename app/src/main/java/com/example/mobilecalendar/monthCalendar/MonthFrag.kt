@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.time.temporal.WeekFields
@@ -54,6 +55,7 @@ class MonthViewContainer(view: View) : ViewContainer(view) {
 class MonthFrag : Fragment() {
     private lateinit var binding: MonthLayoutBinding
     private var selectedDate: LocalDate? = null
+    private lateinit var scheduleAdapter: ScheduleAdapter
 
     suspend fun retrieveDefaultList(date: LocalDate): ListTemplate? {
         Log.d("date", date.toString())
@@ -115,7 +117,8 @@ class MonthFrag : Fragment() {
 
     private fun showModal(date: LocalDate) {
         val modalLayout = LayoutInflater.from(requireContext()).inflate(R.layout.modal_layout, null)
-
+        val start = date.atStartOfDay().toLocalDate()
+        val end = date.atTime(LocalTime.MAX).toLocalDate()
         // EditText 초기화
         val editText = modalLayout.findViewById<EditText>(R.id.context_editText)
         editText.visibility = View.VISIBLE
@@ -193,19 +196,22 @@ class MonthFrag : Fragment() {
             }
         }
 
-        // RecyclerView를 찾습니다.
         val scheduleRecyclerView = modalLayout.findViewById<RecyclerView>(R.id.scheduleRecyclerView)
 
         // ScheduleDAO를 사용하여 해당 날짜의 일정 데이터를 가져옵니다.
         val scheduleDAO = AppDatabase.getInstance(requireContext()).scheduleDao()
         var scheduleList: List<Schedule> = emptyList()
         runBlocking {
-            scheduleList = scheduleDAO.getSchedulesByDate(date)
+            scheduleList = scheduleDAO.getSchedulesByDate(start, end)
         }
 
-        // 기존의 ScheduleAdapter를 사용하여 RecyclerView에 표시합니다.
-        val scheduleAdapter = ScheduleAdapter(scheduleList.toMutableList())
-        scheduleRecyclerView.adapter = scheduleAdapter
+        if (!::scheduleAdapter.isInitialized) {
+            scheduleAdapter = ScheduleAdapter(scheduleList.toMutableList())
+            scheduleRecyclerView.adapter = scheduleAdapter
+        } else {
+            scheduleAdapter.updateScheduleList(scheduleList)
+            scheduleRecyclerView.adapter = scheduleAdapter
+        }
 
         // 다이얼로그로 모달 레이아웃 표시
         val dialog = AlertDialog.Builder(requireContext())
