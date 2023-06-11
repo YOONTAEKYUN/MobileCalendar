@@ -98,6 +98,16 @@ class SetAlarmActivity : AppCompatActivity() {
                         interval = 10
                     )
                 )
+                val title = inputAlarmTitle.text.toString()
+                val content = inputAlarmContent.text.toString()
+
+                if(title.isNotEmpty() && content.isNotEmpty()){
+                    // 저장된 텍스트로 알림 발생
+                    val norificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                    norificationManager.notify(1, buildNotification(title, content))
+                }else{
+                    Toast.makeText(this@SetAlarmActivity, "제목과 내용을 입력해주세요", Toast.LENGTH_SHORT).show()
+                }
             }
             Toast.makeText(this, "일정 추가 완료", Toast.LENGTH_SHORT).show()
             binding.inputAlarmTitle.setText("")
@@ -108,19 +118,6 @@ class SetAlarmActivity : AppCompatActivity() {
         binding.cancleButton.setOnClickListener{//닫기 버튼
             finish() // 창 닫기
         }
-        val title = inputAlarmTitle.text.toString()
-        val content = inputAlarmContent.text.toString()
-        // 설정한 시간과 앱 내 시간과 같으면 알림 발생
-        if(LocalTime.now().hour == currentTime.hour && LocalTime.now().minute == currentTime.minute){
-            if(title.isNotEmpty() && content.isNotEmpty()){
-                // 저장된 텍스트로 알림 발생
-                val norificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                norificationManager.notify(1, buildNotification(title, content))
-            }else{
-                Toast.makeText(this, "제목과 내용을 입력해주세요", Toast.LENGTH_SHORT).show()
-            }
-        }
-
 
     }
 }
