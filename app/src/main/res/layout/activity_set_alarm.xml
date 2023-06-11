@@ -6,16 +6,47 @@
     android:padding="16dp">
 
     <EditText
+        android:id="@+id/inputAlarmTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="제목" />
+    <EditText
+        android:id="@+id/inputAlarmLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="장소" />
+
+    <EditText
         android:id="@+id/inputAlarmContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="알림 내용을 입력하세요" />
+        android:hint="메모" />
+    <TimePicker
+        android:id="@+id/timePicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:timePickerMode="spinner"/>
 
-
-    <Button
-        android:id="@+id/confirmButton"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="저장" />
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/cancleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="취소" />
+        <Button
+            android:id="@+id/confirmButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="저장" />
+        <Button
+            android:id="@+id/kakaoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="공유" />
+    </LinearLayout>
+
 
 </LinearLayout>
