@@ -43,6 +43,8 @@ import kotlinx.coroutines.withContext
 // 디버그 키 해시 : yzXmrPCP5gi9Nt0gJOplguL51Sc=
 // 릴리즈 키 해시 : nZfccoI3KzCvTHynSMOxiSTBwXE=
 
+import com.example.mobilecalendar.monthCalendar.MonthFrag
+import com.example.mobilecalendar.weekCalendar.WeekFrag
 
 
 class MainActivity : AppCompatActivity() {
@@ -108,7 +110,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // BroadcastReceiver 등록
@@ -122,8 +124,6 @@ class MainActivity : AppCompatActivity() {
 
 
         binding.month.setOnClickListener {
-            lifecycleScope.launch { scheduleDao.deleteAllSchedules() }
-
             supportFragmentManager.beginTransaction()
                 .replace(R.id.frag_view, MonthFrag())
                 .commit()

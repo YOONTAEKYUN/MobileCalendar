@@ -1,6 +1,7 @@
 package com.example.mobilecalendar.roomdb
 
 import androidx.room.*
+import java.time.LocalDate
 
 @Dao
 interface ScheduleDAO {
@@ -13,7 +14,6 @@ interface ScheduleDAO {
     @Delete
     suspend fun deleteSchedule(schedule: Schedule)
 
-
     @Query("SELECT * FROM Schedule")
     suspend fun getAllSchedules(): List<Schedule>
 
@@ -24,4 +24,6 @@ interface ScheduleDAO {
     suspend fun deleteAllSchedules()
 
 
+    @Query("SELECT * FROM Schedule WHERE date = :date")
+    suspend fun getSchedulesByDate(date: LocalDate): List<Schedule>
 }
