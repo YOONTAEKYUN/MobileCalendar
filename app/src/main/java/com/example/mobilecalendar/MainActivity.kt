@@ -1,42 +1,34 @@
 package com.example.mobilecalendar
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.room.Room
 import com.example.mobilecalendar.databinding.ActivityMainBinding
-import com.example.mobilecalendar.databinding.MonthLayoutBinding
-import com.example.mobilecalendar.roomdb.Alarm
 import com.example.mobilecalendar.roomdb.AppDatabase
 import com.example.mobilecalendar.roomdb.Schedule
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.kakao.sdk.common.util.KakaoCustomTabsClient
-import com.kizitonwose.calendar.core.CalendarDay
-import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
-import com.kizitonwose.calendar.view.MonthDayBinder
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.YearMonth
 import com.kakao.sdk.share.ShareClient
 import com.kakao.sdk.share.WebSharerClient
 import com.kakao.sdk.template.model.Button
 import com.kakao.sdk.template.model.Content
-import com.kakao.sdk.template.model.FeedTemplate
 import com.kakao.sdk.template.model.Link
 import com.kakao.sdk.template.model.ListTemplate
-import com.kakao.sdk.common.util.Utility
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -48,15 +40,13 @@ import com.example.mobilecalendar.weekCalendar.WeekFrag
 
 
 class MainActivity : AppCompatActivity() {
-    lateinit var binding: ActivityMainBinding
-    //카카오톡 메시지 공유 api, list 템플릿
     suspend fun retrieveDefaultList(): ListTemplate {
         val db = AppDatabase.getInstance(applicationContext)
         val scheduleDao = db.scheduleDao()
         val schedules = withContext(Dispatchers.IO) {
             scheduleDao.getAllSchedules()
         }
-        //content 내용은 최대 3개 표시 가능, 최소 2개 이상 있어야 함
+        //주의 : content 내용은 최대 3개 표시 가능, 최소 2개 이상 있어야 함
         val contents = schedules.map { schedule ->
             Content(
                 title = schedule.title,
@@ -102,20 +92,45 @@ class MainActivity : AppCompatActivity() {
             )
         )
     }
-    suspend fun allDelete(){
-        val db = AppDatabase.getInstance(applicationContext)
-        val scheduleDao = db.scheduleDao()
-        scheduleDao.deleteAllSchedules() //schedule 테이블 전체 삭제
+
+
+    fun buildNotification(title: String, body: String) : Notification {
+        val intent = Intent(this, MainActivity::class.java)
+        val pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+        val channelId = "1234"
+
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            .setPriority(NotificationCompat.PRIORITY_HIGH) //알림을 화면 상단에 배너처럼 띄움
+            .setSmallIcon(android.R.drawable.sym_def_app_icon) // 작은 아이콘 추가
+            .setContentTitle(title)
+            .setContentText(body)
+            .setContentIntent(pIntent)
+        //.setAutoCancel(true)
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // 알림 채널 생성
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(channelId, "알림", NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channel)
+        }
+        return notificationBuilder.build()
+
     }
 
+
+    lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        //알림을 보내는 코드 내용
+        val title = "알림"
+        val content = "내용"
+        val norificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        norificationManager.notify(2, buildNotification(title, content))
 
-        // BroadcastReceiver 등록
-        val filter = IntentFilter("com.example.mobilecalendar.NOTIFICATION_RECEIVED")
-        //LocalBroadcastManager.getInstance(this).registerReceiver(notificationReceiver, filter)
 
 
         val db = AppDatabase.getInstance(applicationContext)
@@ -142,19 +157,6 @@ class MainActivity : AppCompatActivity() {
                 Log.e("MainActivity", "Failed to get Firebase token")
             }
         })
-
-
-//        private val notificationReceiver = object : BroadcastReceiver() {
-//            override fun onReceive(context: Context?, intent: Intent?) {
-//                val title = intent?.getStringExtra("title")
-//                val body = intent?.getStringExtra("body")
-//                // 알림을 받았을 때 원하는 동작을 수행합니다.
-//                // 예를 들면 알림을 화면에 표시하는 등의 처리를 할 수 있습니다.
-//                showNotification(title, body)
-//            }
-//        }
-
-
 
 
         binding.sendButton.setOnClickListener {

@@ -46,21 +46,23 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 //        }
     }
 
-    private fun showNotification(title: String?, body: String?) {
+    fun showNotification(title: String?, body: String?) {
         val intent = Intent(this, MainActivity::class.java)
-        val pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         val channelId = "1234"
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH) //알림을 화면 상단에 배너처럼 띄움
+            .setSmallIcon(R.drawable.sym_def_app_icon) // 작은 아이콘 추가
             .setContentTitle("알림 제목")
             .setContentText("알림 내용")
             .setContentIntent(pIntent)
             //.setAutoCancel(true)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
+    
+        // 알림 채널 생성
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(channelId, "알림", NotificationManager.IMPORTANCE_HIGH)
             notificationManager.createNotificationChannel(channel)

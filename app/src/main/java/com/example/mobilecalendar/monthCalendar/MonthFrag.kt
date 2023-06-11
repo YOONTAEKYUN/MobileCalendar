@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
@@ -44,6 +45,10 @@ class MonthFrag : Fragment() {
         val dateTextView = modalLayout.findViewById<TextView>(R.id.dateTextView)
         dateTextView.text = date.toString()
 
+//        // EditText 초기화
+//        val editText = modalLayout.findViewById<EditText>(R.id.contextEditText)
+//        editText.hint = date.toString()
+
         // RecyclerView를 찾습니다.
         val scheduleRecyclerView = modalLayout.findViewById<RecyclerView>(R.id.scheduleRecyclerView)
 
@@ -62,6 +67,9 @@ class MonthFrag : Fragment() {
         val dialog = AlertDialog.Builder(requireContext())
             .setView(modalLayout)
             .setPositiveButton("OK") { dialog, _ ->
+                // EditText에 입력된 텍스트 사용
+                //val userInput = editText.text.toString()
+                // TODO: userInput를 처리하는 로직 추가
                 dialog.dismiss()
             }
             .create()
