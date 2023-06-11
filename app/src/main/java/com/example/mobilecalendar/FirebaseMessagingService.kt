@@ -4,6 +4,7 @@ import android.R
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
@@ -21,18 +22,31 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendTokenToServer(token: String) {
-        // TODO :: TOKEN 값을 서버에 저장하자!
+        // TOKEN 값을 서버에 저장
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // TODO :: 전달받은 리모트 메시지를 처리하자!
 
         Log.d("MyFcmService", "Notification Title :: ${remoteMessage.notification?.title}")
         Log.d("MyFcmService", "Notification Body :: ${remoteMessage.notification?.body}")
         Log.d("MyFcmService", "Notification Data :: ${remoteMessage.data}")
+
+        val title = remoteMessage.notification?.title
+        val body = remoteMessage.notification?.body
+
+        // 알림 보여주기
+        showNotification(title, body)
+
+        // 조건 확인 로직을 추가하고 푸시 알림을 생성하여 보냄
+//        if (/* 조건을 만족하는지 확인하는 로직 */) {
+//            val notification = remoteMessage.notification
+//            if (notification != null) {
+//                showNotification(notification)
+//            }
+//        }
     }
 
-    private fun showNotification(notification: RemoteMessage.Notification) {
+    private fun showNotification(title: String?, body: String?) {
         val intent = Intent(this, MainActivity::class.java)
         val pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
@@ -40,17 +54,27 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH) //알림을 화면 상단에 배너처럼 띄움
-            .setContentTitle(notification.title)
-            .setContentText(notification.body)
+            .setContentTitle("알림 제목")
+            .setContentText("알림 내용")
             .setContentIntent(pIntent)
+            //.setAutoCancel(true)
 
-        getSystemService(NotificationManager::class.java).run {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(channelId, "알림", NotificationManager.IMPORTANCE_HIGH)
-                createNotificationChannel(channel)
-            }
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            notify(Date().time.toInt(), notificationBuilder.build())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(channelId, "알림", NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channel)
         }
+
+        notificationManager.notify(Date().time.toInt(), notificationBuilder.build())
+
+//        getSystemService(NotificationManager::class.java).run {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                val channel = NotificationChannel(channelId, "알림", NotificationManager.IMPORTANCE_HIGH)
+//                createNotificationChannel(channel)
+//            }
+//
+//            notify(Date().time.toInt(), notificationBuilder.build())
+//        }
     }
 }

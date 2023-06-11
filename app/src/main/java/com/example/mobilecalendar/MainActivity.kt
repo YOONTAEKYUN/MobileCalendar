@@ -1,12 +1,18 @@
 package com.example.mobilecalendar
 
+import android.app.PendingIntent
 import android.content.ActivityNotFoundException
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.room.Room
 import com.example.mobilecalendar.databinding.ActivityMainBinding
 import com.example.mobilecalendar.databinding.MonthLayoutBinding
@@ -99,12 +105,25 @@ class MainActivity : AppCompatActivity() {
         val scheduleDao = db.scheduleDao()
         scheduleDao.deleteAllSchedules() //schedule 테이블 전체 삭제
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // BroadcastReceiver 등록
+        val filter = IntentFilter("com.example.mobilecalendar.NOTIFICATION_RECEIVED")
+        //LocalBroadcastManager.getInstance(this).registerReceiver(notificationReceiver, filter)
+
+
+        val db = AppDatabase.getInstance(applicationContext)
+        val scheduleDao = db.scheduleDao()
+        val alarmDao = db.AlarmDAO()
+
+
         binding.month.setOnClickListener {
+            lifecycleScope.launch { scheduleDao.deleteAllSchedules() }
+
             supportFragmentManager.beginTransaction()
                 .replace(R.id.frag_view, MonthFrag())
                 .commit()
@@ -115,21 +134,28 @@ class MainActivity : AppCompatActivity() {
                 .commit()
         }
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
+            if (task.isSuccessful) {
+                val token = task.result
+                Log.d("MainActivity", "Firebase Token: $token")
+                // 토큰을 서버로 전송하거나 필요한 곳에 사용합니다.
+            } else {
+                Log.e("MainActivity", "Failed to get Firebase token")
             }
-
-            // Get new FCM registration token
-            val token = task.result
-
-            // Log and toast
-            Log.d("token : ", token)
         })
 
-        val db = AppDatabase.getInstance(applicationContext)
-        val scheduleDao = db.scheduleDao()
-        val alarmDao = db.AlarmDAO()
+
+//        private val notificationReceiver = object : BroadcastReceiver() {
+//            override fun onReceive(context: Context?, intent: Intent?) {
+//                val title = intent?.getStringExtra("title")
+//                val body = intent?.getStringExtra("body")
+//                // 알림을 받았을 때 원하는 동작을 수행합니다.
+//                // 예를 들면 알림을 화면에 표시하는 등의 처리를 할 수 있습니다.
+//                showNotification(title, body)
+//            }
+//        }
+
+
+
 
         binding.sendButton.setOnClickListener {
             lifecycleScope.launch {
