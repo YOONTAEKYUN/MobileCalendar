@@ -17,11 +17,17 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:name=".config.ApplicationClass"
         android:theme="@style/Theme.MobileCalendar"
         android:hardwareAccelerated="true"
         tools:targetApi="31">
+
+
         <activity
-            android:name=".MainActivity"
+            android:name=".view.EditTodoActivity"
+            android:exported="false" />
+        <activity
+            android:name="MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

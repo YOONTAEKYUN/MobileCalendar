@@ -3,6 +3,8 @@ package com.example.mobilecalendar
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.navigation.Navigation
+import androidx.navigation.ui.NavigationUI
 import com.example.mobilecalendar.databinding.ActivityMainBinding
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -20,7 +22,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         binding.month.setOnClickListener {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.frag_view, MonthFrag())
@@ -29,6 +30,11 @@ class MainActivity : AppCompatActivity() {
         binding.week.setOnClickListener {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.frag_view, WeekFrag())
+                .commit()
+        }
+        binding.todo.setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.frag_view, TodoMainActivity())
                 .commit()
         }
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->

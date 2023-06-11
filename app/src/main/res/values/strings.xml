@@ -6,4 +6,5 @@
 
     <string name="Month">MONTH</string>
     <string name="Week">WEEK</string>
+    <string name="Todo">To-do</string>
 </resources>
