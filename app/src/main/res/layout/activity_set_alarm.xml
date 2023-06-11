@@ -22,7 +22,12 @@
         android:layout_height="wrap_content"
         android:hint="메모" />
     <TimePicker
-        android:id="@+id/timePicker"
+        android:id="@+id/startTimePicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:timePickerMode="spinner"/>
+    <TimePicker
+        android:id="@+id/finishTimePicker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:timePickerMode="spinner"/>

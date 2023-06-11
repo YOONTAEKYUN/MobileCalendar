@@ -60,17 +60,28 @@ class SetAlarmActivity : AppCompatActivity() {
         val inputAlarmTitle = findViewById<EditText>(R.id.inputAlarmTitle)
         val inputAlarmLocation = findViewById<EditText>(R.id.inputAlarmLocation)
         val inputAlarmContent = findViewById<EditText>(R.id.inputAlarmContent)
-        val timePicker = findViewById<TimePicker>(R.id.timePicker)
+        val startTimePicker = findViewById<TimePicker>(R.id.startTimePicker)
+        val finishTimePicker = findViewById<TimePicker>(R.id.finishTimePicker)
 
-        timePicker.setOnTimeChangedListener{_, hourOfDay, minute ->
+        startTimePicker.setOnTimeChangedListener{_, hourOfDay, minute ->
             // 선택된 시간(hourOfDay)과 분(minute) 값을 사용하여 필요한 작업을 수행
             val selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute)
             Toast.makeText(this, "Selected time: $selectedTime", Toast.LENGTH_SHORT).show()
         }
-        // TimePicker의 현재 시간 가져오기
-        val currentHour = timePicker.hour
-        val currentMinute = timePicker.minute
-        val currentTime = LocalTime.parse(String.format(Locale.getDefault(), "%02d:%02d", currentHour, currentMinute))
+        // startTimePicker의 현재 시간 가져오기
+        val startHour = startTimePicker.hour
+        val startMinute = startTimePicker.minute
+        val startTime = LocalTime.parse(String.format(Locale.getDefault(), "%02d:%02d", startHour, startMinute))
+
+        finishTimePicker.setOnTimeChangedListener{_, hourOfDay, minute ->
+            // 선택된 시간(hourOfDay)과 분(minute) 값을 사용하여 필요한 작업을 수행
+            val selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute)
+            Toast.makeText(this, "Selected time: $selectedTime", Toast.LENGTH_SHORT).show()
+        }
+        // startTimePicker의 현재 시간 가져오기
+        val finishHour = finishTimePicker.hour
+        val finishMinute = finishTimePicker.minute
+        val finishTime = LocalTime.parse(String.format(Locale.getDefault(), "%02d:%02d", finishHour, finishMinute))
 
         val db = AppDatabase.getInstance(applicationContext)
         val scheduleDao = db.scheduleDao()
@@ -94,7 +105,7 @@ class SetAlarmActivity : AppCompatActivity() {
                         scheduleId = scheduleId,
                         title = inputAlarmTitle.text.toString(),
                         message = inputAlarmContent.text.toString(),
-                        time = currentTime,
+                        time = startTime,
                         interval = 10
                     )
                 )

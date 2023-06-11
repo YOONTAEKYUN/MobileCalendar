@@ -17,7 +17,6 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name=".config.ApplicationClass"
         android:theme="@style/Theme.MobileCalendar"
         android:hardwareAccelerated="true"
         tools:targetApi="31">
