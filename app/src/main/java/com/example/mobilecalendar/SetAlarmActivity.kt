@@ -112,7 +112,6 @@ class SetAlarmActivity : AppCompatActivity() {
                 )
                 val title = inputAlarmTitle.text.toString()
                 val content = inputAlarmContent.text.toString()
-
                 if(title.isNotEmpty() && content.isNotEmpty()){
                     // 저장된 텍스트로 알림 발생
                     val norificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager

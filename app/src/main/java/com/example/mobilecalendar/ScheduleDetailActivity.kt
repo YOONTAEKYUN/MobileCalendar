@@ -1,6 +1,7 @@
 package com.example.mobilecalendar
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TimePicker
@@ -80,6 +81,7 @@ class ScheduleDetailActivity : AppCompatActivity() {
             inputAlarmTitle.setText(schedule.title)
             inputAlarmLocation.setText(schedule.place)
             inputAlarmContent.setText(alarm.message)
+            Log.d("Check", inputAlarmContent.toString())
             startTimePicker.hour = schedule.start_time.hour
             startTimePicker.minute = schedule.start_time.minute
             finishTimePicker.hour = schedule.end_time.hour

@@ -13,11 +13,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mobilecalendar.adapter.TodoAdapter
 import com.example.mobilecalendar.databinding.TodoBinding
 import com.example.mobilecalendar.dto.Todo
+import com.example.mobilecalendar.repository.TodoRepository
 import com.example.mobilecalendar.view.EditTodoActivity
 import com.example.mobilecalendar.view.TodoViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TodoMainActivity : Fragment() {
     private lateinit var binding: TodoBinding
@@ -30,6 +32,8 @@ class TodoMainActivity : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = TodoBinding.inflate(inflater, container, false)
+        // TodoRepository 초기화
+        TodoRepository.initialize(requireContext())
         return binding.root
     }
 
@@ -45,10 +49,11 @@ class TodoMainActivity : Fragment() {
             requestActivity.launch(intent)
         }
 
-        todoViewModel = ViewModelProvider(requireActivity())[TodoViewModel::class.java]
-        todoViewModel.todoList.observe(viewLifecycleOwner) {
-            todoAdapter.update(it)
+        todoViewModel = ViewModelProvider(this).get(TodoViewModel::class.java)
+        todoViewModel.todoList.observe(viewLifecycleOwner) { todoList ->
+            todoAdapter.update(todoList)
         }
+
 
         todoAdapter = TodoAdapter(requireContext())
         binding.rvTodoList.layoutManager = LinearLayoutManager(requireContext())
@@ -56,18 +61,32 @@ class TodoMainActivity : Fragment() {
 
         todoAdapter.setItemCheckBoxClickListener(object : TodoAdapter.ItemCheckBoxClickListener {
             override fun onClick(view: View, position: Int, itemId: Long) {
-                Toast.makeText(requireContext(), "$itemId", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(requireContext(), "$itemId", Toast.LENGTH_SHORT).show()
                 CoroutineScope(Dispatchers.IO).launch {
                     val todo = todoViewModel.getOne(itemId)
+                    todo.isChecked = !todo.isChecked
+//                    // 아이템의 상태 변경 후 RecyclerView에 변경사항을 알리기 위해 notifyItemChanged 호출
+//                    withContext(Dispatchers.Main) {
+//                        // UI 업데이트는 메인 스레드에서 수행
+//                        todoAdapter.notifyItemChanged(position)
+//                    }
+                }
+            }
+        })
 
+        todoAdapter.setItemClickListener(object : TodoAdapter.ItemClickListener {
+            override fun onClick(view: View, position: Int, itemId: Long) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    // 클릭 이벤트 처리
+                    val todo = todoViewModel.getOne(itemId)
                     val intent = Intent(requireContext(), EditTodoActivity::class.java).apply {
                         putExtra("type", "EDIT")
                         putExtra("item", todo)
                     }
                     requestActivity.launch(intent)
-                    todo.isChecked = !todo.isChecked
                     todoViewModel.update(todo)
                 }
+
             }
         })
     }
